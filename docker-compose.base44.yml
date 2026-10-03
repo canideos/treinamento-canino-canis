@@ -1,0 +1,23 @@
+# Base44 development environment.
+# The project is a static HTML site: no build step, no runtime dependencies,
+# no external services. Source is bind-mounted so edits are served live.
+services:
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", ".base44/dev-server.mjs"]
+    environment:
+      - PORT=3000
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    env_file:
+      - /run/base44/app.env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ | grep -q 'Manual Completo'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: on-failure
